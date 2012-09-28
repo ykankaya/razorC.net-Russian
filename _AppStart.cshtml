@@ -1,0 +1,13 @@
+﻿@using System.Web.Routing
+
+@{    
+    RouteTable.Routes.MapWebPageRoute("{rcPageName}/{rc0}/{rc1}", "~/Default.cshtml", new { rcPageName = "default", rc0=-1,rc1=-1});
+    
+            
+  //  WebSecurity.InitializeDatabaseConnection("StarterSite", "UserProfile", "UserId", "Email", true);
+    // WebMail.SmtpServer = "mailserver.example.com";
+    // WebMail.EnableSsl = true;
+    // WebMail.UserName = "username@example.com";
+    // WebMail.Password = "your-password";
+    // WebMail.From = "your-name-here@example.com";
+}

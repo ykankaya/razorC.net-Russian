@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Vegetables  
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20110416
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>@Page.mTitle</title>
+<meta name="keywords" content="@Page.mKeywords" />
+<meta name="description" content="@Page.mDescription" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="@Href("~/rcLayouts/vegetable/style.css")" rel="stylesheet" type="text/css" media="screen" />
+@RenderSection("head")
+</head>
+<body>
+<div id="header">
+	<div id="logo">
+		@RenderSection("rcTop",false)
+	</div>
+</div>
+<!-- end #header -->
+<div id="wrapper">
+	<div id="menu">
+	@rcHelpers.SimpleMenu()
+	</div>
+	<!-- end #menu -->
+</div>
+<div id="page">
+	<div id="content">
+		@RenderBody()
+                     @RenderSection("rcBottom",false)
+	</div>
+	<!-- end #content -->
+	<div id="sidebar">
+		<ul>
+             @RenderSection("rcLeft",false)
+             @RenderSection("rcRight",false)
+		</ul>
+	</div>
+	<!-- end #sidebar -->
+	<div style="clear: both;">&nbsp;</div>
+</div>
+<!-- end #page -->
+<div id="footer-menu">
+	@rcHelpers.SimpleMenu()
+</div>
+<div id="footer">
+	<p>Copyright (c) @DateTime.Now.Year @Request.Url.Host.ToLower(). All rights reserved. Design by <a href="http://www.freecsstemplates.org/">FCT</a>. Powered by <a href="http://www.razorc.net" title="free CMS made with ASP.net web pages">razorC</a></p>
+</div>
+<!-- end #footer -->
+</body>
+</html>

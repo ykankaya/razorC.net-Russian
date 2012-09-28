@@ -1,0 +1,156 @@
+﻿@{
+
+    Page.Title = "Создание новой страницы";
+    var pName = "";
+    var pTitle = "Название страницы Здесь";
+    var pText = "Текст страницы";
+    var mTitle = "Мета тег: Title";
+    var mDescription = "Мета тег: Description";
+    var mKeywords = "Мета тег: Keywords";
+    var pMasterPage = "";
+    var pEditDate = DateTime.Now;
+    var pBody = true;
+    var pBodyFile = "";
+
+    var errMSG = "";
+
+    var fromPage = Request["fromPage"];
+    
+    //List all Layout files
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcLayouts"));  
+    FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
+
+    // list all the body pages
+    DirectoryInfo dirInfoBody = new DirectoryInfo(Server.MapPath("~/rcTemplates/Body"));
+    FileInfo[] fileInfoBody = dirInfoBody.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
+    
+    
+    var db = Database.Open("razorC");
+    
+    
+    if (IsPost){
+
+        pName = Request["pName"];
+        pMasterPage = Request["pMasterPage"];
+        pBodyFile = Request["pBodyFile"];
+        
+        if(pName.IsEmpty()){
+            errMSG = "Пожалуйста, введите название страницы <br />";
+            
+        }
+        
+        if(pMasterPage.IsEmpty()){
+            errMSG += "Выберите макет для новой страницы<br />";
+            
+        }
+
+        if (errMSG.IsEmpty())
+        {
+      
+            
+            if (!fromPage.IsEmpty()){
+            //clean pName - it is not passed as parameter :(
+                var pNameSQL = pName.Replace(" ", "");
+                pNameSQL = pNameSQL.Replace("'", "");
+                    
+                    
+            //copy existing page
+                var copyPage = "INSERT INTO rc_Pages " +
+                             "(pName, pTitle, pText, mTitle, mDescription, mKeywords, pMasterPage, pEditDate, pBody, rcPage, pBodyFile)" +
+                             " SELECT '" + pNameSQL + "' AS pName, pTitle, pText, mTitle, mDescription, mKeywords, pMasterPage, pEditDate, pBody, rcPage, pBodyFile " +
+                            "FROM  rc_Pages AS rc_Pages_1 WHERE (pName = @0)";
+               db.Execute(copyPage, fromPage);
+               var copyId = db.GetLastInsertId();
+                
+              //copy widget
+                var copyWidgets = "INSERT INTO rc_PageWidget " +
+                         "(sName, wOrderId, wId, pId) " +
+                         " Select sName,WOrderId, wId, " + copyId + " from rc_PageWidget pw inner join rc_Pages p on pw.pID=p.pId where p.pName=@0";
+                
+                
+                db.Execute(copyWidgets,fromPage);
+
+                Response.Redirect("Editpage.cshtml?id=" + copyId );
+                
+            }
+            else{
+             var sqlIN = "Insert into rc_Pages "
+            + "(pName, pTitle, pText, mTitle, mDescription, mKeywords, pMasterPage, pEditDate, pBody, rcPage, pBodyFile) values "
+            + "(@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10)";
+
+
+             try
+             {
+                 db.Execute(sqlIN, pName, pTitle, pText, mTitle, mDescription, mKeywords, pMasterPage, pEditDate, pBody, 1, pBodyFile);
+                 Response.Redirect("Editpage.cshtml?id=" + db.GetLastInsertId());
+             }
+             catch (Exception ex)
+             {
+
+                 errMSG = ex.Message.ToString();
+             }
+                
+            }
+                
+        }
+    }
+
+
+    //select pages 
+    var sqlPages = "Select pName from rc_Pages where rcPage=1 order by pName";
+    var pages = db.Query(sqlPages);
+    
+}
+
+@section head {
+
+}
+
+@if (!errMSG.IsEmpty())
+{
+<div> 
+@Html.Raw(errMSG)
+</div>
+}
+<form method="post" action="">
+ <fieldset>
+        <legend>Новая страница</legend>
+        <ol>
+            <li >
+                <label for="pName">Название (адрес):</label>
+                <input type="text" name="pName" id="pName" value="@pName" maxlength="100" /> <img src="images/help.gif" alt="Помощь" title="Название новой страницы." />
+                </li>
+                <li>
+                <label for="pMasterPage">Выберите макет:</label>
+                <select id="pMasterPage" name="pMasterPage">
+               @foreach (var f in fileInfo )
+               {
+                <option value="@f.Name" @if(pMasterPage==f.Name){<text>selected="selected"</text>}>@rcFunctions.CleanRCNames(f.Name)</option>
+                }
+                </select> <img src="images/help.gif" alt="Помощь" title="Выберите макет / тему для новой страницы. Все макеты в папке rcLayouts - вы можете добавлять / изменять / модифицировать их под свои нужды" />
+            </li>
+             <li>
+                <label for="pBodyFile">Шаблона содеожимиго:</label>
+                <select id="pBodyFile" name="pBodyFile">
+               @foreach (var f in fileInfoBody )
+               {
+                <option value="@f.Name" @if(pBodyFile==f.Name){<text>selected="selected"</text>}>@rcFunctions.CleanRCNames(f.Name)</option>
+               }
+                </select>  <img src="images/help.gif" alt="Помощь" title="Шаблон, который будет использоваться для отображения части тела вашей страницы. Все шаблоны в rcTempaltes/Body - вы можете добавлять / изменять / модифицировать их под свои нужды" />
+            </li>
+            <li>
+            <label for="fromPage">или создать на основе существующей страницы:</label>
+                <select id="fromPage" name="fromPage">
+                    <option value="">Выберите один</option>
+                    @foreach (var p in pages)
+                    {
+                        <option value="@p.pName" @if(fromPage==p.pName){<text>selected="selected"</text>}>@p.pName</option>
+                    }
+                </select>  <img src="images/help.gif" alt="Помощь" title="Вы можете создавать новые страницы на основе существующей. Все содержание, мета-теги, виджеты будут скопированы на новую страницу." />
+            </li>
+        </ol>
+          <p class="form-actions">
+            <input type="submit" value="Создать" title="Создать" />
+        </p>
+</fieldset>
+</form>

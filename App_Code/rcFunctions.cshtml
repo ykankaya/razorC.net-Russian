@@ -1,0 +1,12 @@
+﻿@functions {
+
+    public static string CleanRCNames(string name)
+    {
+        name = name.Replace("_rc", "");
+        name = name.Replace(".cshtml", "");
+        name = name.Replace("rc", "");
+
+        return name;
+    }
+
+}

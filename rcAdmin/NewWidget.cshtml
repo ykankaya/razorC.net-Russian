@@ -1,0 +1,89 @@
+﻿@{
+    Page.Title = "Создание нового виджета";
+
+    var wName = "";
+    var wTitle = "Название";
+    var wText = "Содержание";
+    var wEditDate = DateTime.Now;
+    var wFile = "";
+
+    var errMSG = "";
+
+    //List all Layout files
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcTemplates"));
+    FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
+
+
+    if (IsPost)
+    {
+
+        wName = Request["wName"];
+        wFile = Request["wFile"];
+
+        if (wName.IsEmpty())
+        {
+            errMSG = "Пожалуйста, введите название <br />";
+
+        }
+
+        if (wFile.IsEmpty())
+        {
+            errMSG += "Выберите Шаблон<br />";
+
+        }
+
+        if (errMSG.IsEmpty())
+        {
+            var db = Database.Open("razorC");
+            var sqlIN = "Insert into rc_Widgets "
+                + "(wName, wTitle, wText, wEditDate, wFile) values "
+                + "(@0, @1, @2, @3, @4)";
+
+            try
+            {
+                db.Execute(sqlIN, wName, wTitle, wText, wEditDate, wFile );
+                Response.Redirect("EditWidget.cshtml?id=" + db.GetLastInsertId());
+            }
+            catch (Exception ex)
+            {
+                errMSG = ex.Message.ToString();
+            }
+        }
+
+
+    }
+}
+
+@section head {
+    
+}
+
+@if (!errMSG.IsEmpty())
+{
+<div> 
+@Html.Raw(errMSG)
+</div>
+}
+<form method="post" action="">
+ <fieldset>
+        <legend>Новый виджет</legend>
+        <ol>
+            <li >
+                <label for="wName">Название:</label>
+                <input type="text" name="wName" id="pName" value="@wName" maxlength="100" /> <img src="images/help.gif" alt="Помощь" title="Имя нового виджета. Рекомендуемые имена в формате section_name-widget_name" />
+                </li>
+                <li>
+                <label for="wFile">Шаблон:</label>
+                <select id="wFile" name="wFile">
+               @foreach (var f in fileInfo )
+               {
+                <option value="@f.Name" @if(wFile==f.Name){<text>selected="selected"</text>}>@rcFunctions.CleanRCNames(f.Name)</option>
+                }
+                </select> <img src="images/help.gif" alt="Помощь" title="Шаблон, razorC будет использовать для отображения виджетов. Все они расположены в rcTemplates, так что вы можете создавать новые / изменять их под свои нужды" />
+            </li>
+        </ol>
+          <p class="form-actions">
+            <input type="submit" value="Создать" title="Создать" />
+        </p>
+</fieldset>
+</form>

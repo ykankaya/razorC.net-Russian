@@ -1,0 +1,135 @@
+﻿@{
+    Page.Title = "Меню";
+    var db = Database.Open("razorC");
+
+    var errMsg = "";
+    var smName = Request["smName"];
+    var smURL = Request["smURL"];
+    var smOrderId = Request["smOrderId"];
+    var smTarget = Request["smTarget"];
+    
+    //delete record 
+    var deleteID = Request["id"];
+    if (!deleteID.IsEmpty())
+    {
+        var sqlDelete = "delete from rc_SimpleMenu where Id=@0";
+        db.Execute(sqlDelete, deleteID);
+        Response.Redirect("SimpleMenu");
+    }
+    
+    if (IsPost){
+                  
+        if (smName.IsEmpty()){
+            errMsg = "Пожалуйста, введите название<br/>";
+        }
+        if (smOrderId.IsEmpty())
+        {
+            errMsg += "Пожалуйста, введите порядок <br/>";
+        }
+        
+        //no errors = insert record
+        if (errMsg.IsEmpty())
+        {
+            
+            
+            if (smURL.IsEmpty()){
+            smURL="~/" + Request["smPage"];
+            if (smURL.ToLower() == "~/default") { smURL = "~/"; }
+            }
+            
+            
+        var sqlInsert = "Insert into rc_SimpleMenu "
+            +"(smName, smURL, smOrderId, smTarget) values "
+            +"(@0, @1, @2, @3)";
+        try
+        {
+            db.Execute(sqlInsert, smName, smURL, smOrderId, smTarget);
+            Response.Redirect("SimpleMenu");
+        }
+        catch (Exception ex)
+        {
+            
+            errMsg = ex.Message.ToString();
+        }
+        
+        }
+        
+    }
+
+
+    var sqlSelect = "Select * from rc_SimpleMenu order by smOrderId DESC";
+    var data = db.Query(sqlSelect);
+    var grid = new WebGrid(data);
+    
+    //select pages 
+    var sqlPages = "Select pName from rc_Pages where rcPage=1 order by pName";
+    var pages = db.Query(sqlPages);
+    
+}
+
+@section head {
+    
+}
+
+ <fieldset>
+   <legend>Редактирование</legend>
+   @if (!errMsg.IsEmpty())
+    {
+    <div> 
+        @Html.Raw(errMsg)
+    </div>
+    }
+
+     <form action="" method="post">
+       <ol>
+            <li >
+                <label for="smName">Имя:</label>
+                <input type="text" name="smName" id="smName" value="@smName" maxlength="50" /> <img src="images/help.gif" alt="Помощь" title="Имя, которое будет отображаться в меню" />
+             </li>
+             <li >
+                <label for="smPage">Выберите страницу:</label>
+                 <select id="smPage" name="smPage">
+                 @foreach (var row in pages)
+                 {
+                      <option value="@row.pName" @if(Request["smPage"]==row.pName){<text>selected="selected"</text>}>@row.pName</option>
+                 }
+                    
+                 </select> <img src="images/help.gif" alt="Помощь" title="Выберите страницу, на которую требуется перейти по ссылке" />
+             </li>
+             <li >
+                <label for="smURL">или введите Адрес:</label>
+                <input type="text" name="smURL" id="smURL" value="@smURL" maxlength="250" /> <img src="images/help.gif" alt="Помощь" title="Используйте это, если вы хотите, чтобы ссылки на страницы, которые находятся вне вашего сайта напр.: http://www.worldfly.info" />
+             </li>
+               <li >
+                <label for="smOrderId">Порядок:</label>
+                <input type="text" name="smOrderId" id="smOrderId" value="@smOrderId" /> <img src="images/help.gif" alt="Помощь" title="Чем выше число, тем выше положение пункта в меню" />
+             </li>
+              <li >
+                <label for="smTarget">Target:</label>
+                  <select id="smTarget" name="smTarget">
+                      <option value="_self"  @if(smTarget=="_self"){<text>selected="selected"</text>}>То же окно</option>
+                      <option value="_blank" @if(smTarget=="_blank"){<text>selected="selected"</text>}>Новое окно</option>
+                  </select> <img src="images/help.gif" alt="Помощь" title="Страница откроется в новой вкладке или в том же окне." />
+             </li>
+              
+    </ol> <input type="submit" value="Сохранить" title="Сохранить" />
+</form> 
+    </fieldset>
+     <fieldset>
+   <legend>Available</legend>
+    @grid.GetHtml(tableStyle: "rcGrid",
+                headerStyle: "head",
+                alternatingRowStyle: "alt", 
+                columns:grid.Columns(
+                    grid.Column("smName", "Name", style: "rcGB"), 
+                    grid.Column("URL", format:@<i>@item.smURL</i>),
+                    grid.Column("Order",format:@<span class="rcGB"><a href="ChangeOrderId.cshtml?tn=rc_simplemenu&cv=1&id=@item.Id"><img
+                        src="images/up.gif" alt="up" class="rcGC"/></a>
+                    <a href="ChangeOrderId.cshtml?tn=rc_simplemenu&cv=-1&id=@item.Id"><img src="images/down.gif" alt="down" class="rcGC" style="margin-right:10px" /></a>@item.smOrderId</span>),
+                    grid.Column("smTarget", "Target"),
+                    grid.Column(format:@<a href="SimpleMenu.cshtml?id=@item.Id" onclick="return confirm('Вы действительно хотите удалить ?')" title="Удаление"><img
+                        src="images/delete.gif" class="rcGC" alt="Удаление" /></a>)
+                                    )
+                            )
+
+</fieldset> 

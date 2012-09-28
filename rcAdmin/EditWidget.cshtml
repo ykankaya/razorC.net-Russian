@@ -1,0 +1,190 @@
+﻿@{
+    //fileManager
+    Response.Cookies[Session.SessionID].Value = "True";
+    Response.Cookies[Session.SessionID].Expires = DateTime.Now.AddHours(3);
+    var fbURL = System.Web.VirtualPathUtility.ToAbsolute("~/tiny_mce/plugins/FileManager/Default.aspx?sessionid=") + Session.SessionID.ToString();
+    
+    //List all Layout files
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcTemplates"));
+    FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
+
+    var Id = Request["id"];
+    var errMSG = "";
+
+    var db = Database.Open("razorC");
+    var sqlSelect = " Select * from rc_Widgets where Id=@0";
+    var data = db.QuerySingle(sqlSelect, Id);
+
+    var wName = data.wName;
+    var wTitle = data.wTitle;
+    var wText = data.wText;
+    var wEditDate = data.wEditDate;
+    var wFile = data.wFile;
+
+    if (IsPost)
+    {
+        
+        
+         if (!Request["btnUpdate"].IsEmpty()){
+       
+        //create backup copy before update
+         var sqlBackup = "Insert INTO rc_Backups (pwId, pwName, pwTitle, pwText, pwFile, pwDate, BType) "
+            + "values (@0, @1, @2, @3, @4, @5,'w')";
+             db.Execute(sqlBackup, Id, wName, wTitle, wText, wFile, wEditDate);
+             
+        //update record     
+        wName = Request["wName"];
+        wTitle = Request["wTitle"];
+        wText = Request.Unvalidated("wText");
+        wEditDate = DateTime.Now;
+        wFile = Request["wFile"];
+
+        var sqlUpdate = "Update rc_Widgets set "
+            + "wTitle=@0, wText=@1, wEditdate=@2, wFile=@3 "
+            + "where Id=@4";
+
+        try{
+            db.Execute(sqlUpdate, wTitle, wText, wEditDate, wFile, Id);
+            errMSG = "Data saved !";
+            }
+        catch (Exception ex){
+
+            errMSG = ex.Message.ToString();
+            }
+         }else{
+              //from backup - load current version selected
+             if (Request["rcBackup"].AsInt() ==0){Response.Redirect("EditWidget.cshtml?id=" + Id);}
+             //load from backup - post & btnUpdate is empty
+             var loadFromBackup = "Select * from rc_Backups where Id=@0";
+             var dataFromBackup = db.QuerySingle(loadFromBackup, Request["rcBackup"]);
+
+             wName = dataFromBackup.pwName;
+             wTitle = dataFromBackup.pwTitle;
+             wText = dataFromBackup.pwText;
+             wEditDate = dataFromBackup.pwDate;
+             wFile = dataFromBackup.pwFile;
+            }
+        
+    }
+
+    int numberOfBackups = 0;
+    var selectBackups = "Select Id, pwDate from rc_Backups where bType='w' and pwID=@0 order by id Desc";
+    var dataBackups = db.Query(selectBackups, Id);
+    numberOfBackups = dataBackups.Count();
+    //delete old backups, we want keep only top 5 backups per page/widget
+    if (numberOfBackups > 5)
+    {
+        int TopRecords = numberOfBackups - 5;
+        var deleteBackups = "Delete from rc_Backups where Id in (Select TOP " + TopRecords + " Id from rc_Backups where bType='w' and pwID=@0 order by Id Asc)";
+        db.Execute(deleteBackups, Id);
+    }
+
+    }
+
+@section head {
+<!-- You can use any editor you want. We decided to use TinyMCE visit http://tinymce.moxiecode.com/ for licence and help -->
+<!-- TinyMCE -->
+<script src="@Href("~/tiny_mce/tiny_mce_src.js")" type="text/javascript"></script>
+<script type="text/javascript">
+        var language = navigator.userLanguage;
+        tinyMCE.init({
+            relative_urls: false,
+            // General options
+            mode: "textareas",
+            theme: "advanced",
+            height: "400",
+            plugins: "safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
+            extended_valid_elements: "div[*],span[*],iframe[src|width|height|name|align]",
+
+            // Theme options
+            theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+            theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+            theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+            theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak",
+            theme_advanced_toolbar_location: "top",
+            theme_advanced_toolbar_align: "left",
+            theme_advanced_statusbar_location: "bottom",
+            theme_advanced_resizing: true,
+            file_browser_callback : "filebrowser",
+
+            // Drop lists for link/image/media/template dialogs
+            template_external_list_url: "lists/template_list.js",
+            external_link_list_url: "lists/link_list.js",
+            external_image_list_url: "lists/image_list.js",
+            media_external_list_url: "lists/media_list.js"
+        });
+        function filebrowser(field_name, url, type, win) {
+
+            fileBrowserURL = "@fbURL";
+
+            tinyMCE.activeEditor.windowManager.open({
+                title: "Ajax File Manager",
+                url: fileBrowserURL,
+                width: 950,
+                height: 650,
+                inline: 0,
+                maximizable: 1,
+                close_previous: 0
+            }, {
+                window: win,
+                input: field_name,
+                sessionid: '@Session.SessionID.ToString()'
+            }
+);
+        }
+
+    </script>
+<!-- /TinyMCE -->
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#rcBackup").change(function () {
+            $("#editWidget").submit();
+        });
+
+    });
+</script>
+}
+
+<form action="" method="post" id="editWidget">
+ <fieldset>
+        <legend>Редактирование виджета</legend>
+        @errMSG
+        Последнее изменение: @wEditDate 
+        <ol>
+                <li>
+                <label for="wName">Навание:</label>
+                <input type="text" name="wName" id="wName" value="@wName" readonly="readonly" maxlength="100" /> <img src="images/help.gif" alt="Помощь" title="Название виджета. Вы не можете изменить это" />
+                </li>
+
+               <li>
+                <label for="wFile">Шаблон:</label>
+                <select id="wFile" name="wFile">
+               @foreach (var f in fileInfo)
+               {
+                <option value="@f.Name" @if (wFile == f.Name)
+                                        {<text>selected="selected"</text>}>@rcFunctions.CleanRCNames(f.Name)</option>
+               }
+                </select> <img src="images/help.gif" alt="Помощь" title="Шаблон используется для отображения виджетов - он меняет способ отображения содержание этого виджета отображается для конечных пользователей. Все шаблоны находятся в папке rcTemplates" />
+            </li>
+
+                <li>
+                <label for="wTitle">Имя:</label>
+                <input type="text" name="wTitle" id="wTitle" value="@wTitle"  maxlength="100" /> <img src="images/help.gif" alt="Помощь" title="Название виджета. В зависимости от выбранного шаблона оно будет или не будет видно конечному пользователю" />
+                </li>
+               
+            </ol>
+            <textarea id="wText" name="wText" cols="80" rows="15">@wText</textarea>
+     <input type="submit" name="btnUpdate" value="Update" />
+        <select id="rcBackup" name="rcBackup">
+     <option value="-1">Загрузка из резервной копии</option>
+               @foreach (var f in dataBackups.Take(5) )
+               {
+                <option value="@f.Id">@f.pwDate</option>
+               }
+            <option value="0">Загрузить текущую версию</option>
+                </select> <img src="images/help.gif" alt="Помощь" title="Загрузка контента из резервной копии. Каждый раз, когда вы обновляете виджет / страницу razorC будет создавать резервную копию, виджета / страницы. По умолчанию последние 5 версий виджета / страницы хранятся в таблице rc_Backups." />
+       
+</fieldset> 
+
+</form>

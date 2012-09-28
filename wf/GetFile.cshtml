@@ -1,0 +1,19 @@
+﻿@{
+    var type = Request.QueryString["type"];
+    var file = Request.QueryString["file"];
+    var name = Request.QueryString["name"];
+    var extension = Request.QueryString["extension"];
+    var load = Request.QueryString["load"];
+
+    if(load != null && extension != null && name != null){
+        Response.AppendHeader("Content-Disposition", String.Format("attachment; filename={0}", HttpUtility.UrlPathEncode(name + "." + extension)));
+        }
+
+
+    if(file == null || type == null){
+    Response.SetStatus(HttpStatusCode.NotFound);
+    return;
+    }
+    Response.ContentType = type;    
+    Response.WriteFile(file);
+}

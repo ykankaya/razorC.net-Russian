@@ -1,0 +1,103 @@
+﻿@{
+    //super simple login page
+    //just to provide basic protection for control panel
+    //Page.Title = "";
+    //Layout = "~/wf/_SystemTemplate.cshtml";
+    if (IsPost){
+
+        var un = Request["uName"];
+        var up = Request["uPwd"];
+        
+    
+        var db = Database.Open("razorC");
+        var sqlSelect = "Select * from rc_Login where rcUser=@0 and rcPwd=@1";
+        var data = db.QuerySingle (sqlSelect, un, up);
+        
+        if (data!=null)
+        {
+            FormsAuthentication.RedirectFromLoginPage(un, false);
+        
+        }
+        
+    }
+    
+    
+    }
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>razorC.net - Авторизация</title>
+        
+        <style type="text/css" >
+            body {
+        background-color: #ffffff;
+        font-size: .85em;
+        font-family: "Trebuchet MS", Verdana, Helvetica, Sans-Serif;
+        margin: 0;
+        padding: 0;
+        color: #696969;
+    }
+            fieldset {
+        margin: 1em 0;
+        padding: 1em;
+        border: 1px solid #CCC;
+    }
+
+        fieldset legend {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 2px 4px 8px 4px;
+        }
+    
+        fieldset ol {
+            padding: 0;
+            list-style: none;
+        }
+    
+            fieldset ol li {
+                padding-bottom: 5px;
+            }
+    
+        fieldset label {
+            display: block;
+        }
+    
+        fieldset label.checkbox {
+            display: inline;
+        }
+    
+        fieldset input[type="text"], input[type="password"] {
+            border: 1px solid #ccc;
+            padding: 2px;
+            font-size: 1.2em;
+            color: #444;
+            width: 300px;
+        }
+
+        fieldset input[type="submit"] {
+            font-size: 1.2em;
+            padding: 5px;
+    }
+        </style>
+    </head>
+    <body>
+        <form method="post" action="">
+ <fieldset>
+        <legend>Вход</legend>
+        <ol>
+            <li >
+                <label for="uName">Пользователь:</label>
+                <input type="text" name="uName" id="uName" value="" maxlength="50" />
+                </li>
+                <li>
+                <label for="uPwd">Пароль:</label>
+                <input type="password" name="uPwd" id="uPwd" value="" />
+            </li>
+        </ol>
+          <p class="form-actions">
+            <input type="submit" value="Войти" title="Войти" />
+        </p>
+</fieldset>
+</form>
+    </body>
+</html>

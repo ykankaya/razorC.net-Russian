@@ -1,0 +1,58 @@
+﻿@{
+    //List all Layout files
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcAddons"));
+    DirectoryInfo[] listAddons = dirInfo.GetDirectories("*", SearchOption.TopDirectoryOnly);
+  
+    }
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>razorC.net CMS</title>
+        <link href="@Href("~/rcAdmin/css/rcCP.css")" rel="stylesheet" />
+        <link href="@Href("~/rcAdmin/css/grid/style.css")" rel="stylesheet" type="text/css" />
+         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.6.1.js"></script>  
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.14/jquery-ui.js"></script>  
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.js"></script>
+        <link type="text/css" rel="Stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.16/themes/black-tie/jquery-ui.css" />
+        @RenderSection("head", required: false)
+    </head>
+    <body>
+    <div id="page">
+    <div id="menu">
+    <a href="@Href("~/Default")">Ваш сайт</a>
+    <ul>
+    <li><a href="@Href("Default")">Панель управления</a></li>
+    <li><a href="@Href("ChangePassword")">Изменить пароль</a></li>
+    </ul>
+    <ul>
+    <li><a href="@Href("NewPage")">Создать страницу</a></li>
+    <li><a href="@Href("AllPages")">Все страницы</a></li>
+    </ul>
+    <ul>
+    <li><a href="@Href("SimpleMenu")">Меню сайта</a></li>
+    </ul>
+      <ul>
+    <li><a href="@Href("NewWidget")">Создать виджет</a></li>
+    <li><a href="@Href("AllWidgets")">Показать все виджеты</a></li>
+    </ul>
+    <ul>
+    <li><a href="@Href("Editor")">Редактор файлов</a></li>
+    </ul>
+    <a href="http://www.razorc.net/add-ons">Дополнения</a>
+    <ul>
+    @foreach (var d in listAddons)
+    {
+         <li><a href="@Href("~/rcAdmin/" + @d.Name + "/default")">@d.Name</a></li>
+    }
+    </ul>
+    </div>
+    <div id="content">
+    <h1>@Page.Title</h1>
+        <div id="renderBody">
+        @RenderBody()
+        </div>
+    </div>
+    </div>
+        
+    </body>
+</html>

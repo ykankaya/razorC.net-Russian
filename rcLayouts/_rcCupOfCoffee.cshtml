@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Title      : Cup of Coffee
+Version    : 1.0
+Released   : 20081207
+Description: A two-column, fixed-width and lightweight template ideal for 1024x768 resolutions. Suitable for blogs and small websites.
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>@Page.mTitle</title>
+<meta name="keywords" content="@Page.mKeywords" />
+<meta name="description" content="@Page.mDescription" />
+<link href="@Href("~/rcLayouts/cupofcoffee/default.css")" rel="stylesheet" type="text/css" />
+@RenderSection("head")
+</head>
+
+<body>
+
+<div id="wrapper">
+
+<!-- start header -->
+<div id="header">
+<div id="menu">
+@rcHelpers.SimpleMenu()
+</div>
+</div>
+<!-- end header -->
+
+<div id="logo">
+@RenderSection("rcTop",false)
+</div>
+
+<!-- start page -->
+<div id="page">
+	<!-- start content -->
+	<div id="content">
+	@RenderBody()
+    @RenderSection("rcBottom",false)
+	</div>
+	<!-- end content -->
+	<!-- start sidebar -->
+	<div id="sidebar">
+		<ul>
+             @RenderSection("rcLeft",false)
+             @RenderSection("rcRight",false)
+		</ul>
+	</div>
+	<!-- end sidebar -->
+	<div style="clear: both;">&nbsp;</div>
+</div>
+<!-- end page -->
+<!-- start footer -->
+<div id="footer">
+	<div id="footer-wrap">
+	<p id="legal">(c) @DateTime.Now.Year @Request.Url.Host.ToLower(). Design by <a href="http://www.freecsstemplates.org/">FCT</a>. Powered by <a href="http://www.razorc.net" title="free CMS made with ASP.net web pages">razorC</a></p>
+	</div>
+</div>
+<!-- end footer -->
+
+</div>
+
+</body>
+</html>
