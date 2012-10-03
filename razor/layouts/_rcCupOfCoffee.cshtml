@@ -17,11 +17,11 @@ Description: A two-column, fixed-width and lightweight template ideal for 1024x7
 <title>@Page.mTitle</title>
 <meta name="keywords" content="@Page.mKeywords" />
 <meta name="description" content="@Page.mDescription" />
-<link href="@Href("~/rcLayouts/cupofcoffee/default.css")" rel="stylesheet" type="text/css" />
+<link href="@Href("~/razor/layouts/cupofcoffee/default.css")" rel="stylesheet" type="text/css" />
 @RenderSection("head")
 </head>
 
-<body>
+<body oncontextmenu="return menu(1, event);">
 
 <div id="wrapper">
 
@@ -64,7 +64,8 @@ Description: A two-column, fixed-width and lightweight template ideal for 1024x7
 </div>
 <!-- end footer -->
 
-</div>
+</div>     <div id="contextMenuId" style="position: absolute; top: 1876px; left: 275px; border: 1px solid #d1d1d1;background:#fff; float: left; display: none;box-shadow: 1px Gray;"></div>
+
 
 </body>
 </html>

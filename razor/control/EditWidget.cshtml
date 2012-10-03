@@ -5,7 +5,7 @@
     var fbURL = System.Web.VirtualPathUtility.ToAbsolute("~/tiny_mce/plugins/FileManager/Default.aspx?sessionid=") + Session.SessionID.ToString();
     
     //List all Layout files
-    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcTemplates"));
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/razor/templates"));
     FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
 
     var Id = Request["id"];

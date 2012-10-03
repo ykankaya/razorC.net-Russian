@@ -16,10 +16,10 @@ Released   : 20110620
 <meta name="keywords" content="@Page.mKeywords" />
 <meta name="description" content="@Page.mDescription" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="@Href("~/rcLayouts/scribbled/style.css")" rel="stylesheet" type="text/css" media="screen" />
+<link href="@Href("~/razor/layouts/scribbled/style.css")" rel="stylesheet" type="text/css" media="screen" />
 @RenderSection("head")
 </head>
-<body>
+<body oncontextmenu="return menu(1, event);">
 <div id="wrapper">
 	<div id="wrapper-bgbtm">
 		<div id="bg1">
@@ -63,6 +63,7 @@ Released   : 20110620
 		</div>
 		<!-- end #footer -->
 	</div>
-</div>
+</div>     <div id="contextMenuId" style="position: absolute; top: 1876px; left: 275px; border: 1px solid #d1d1d1;background:#fff; float: left; display: none;box-shadow: 1px Gray;"></div>
+
 </body>
 </html>

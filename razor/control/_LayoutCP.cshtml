@@ -1,6 +1,6 @@
 ﻿@{
     //List all Layout files
-    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcAddons"));
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/razor/addons"));
     DirectoryInfo[] listAddons = dirInfo.GetDirectories("*", SearchOption.TopDirectoryOnly);
   
     }
@@ -8,8 +8,8 @@
 <html>
     <head>
         <title>razorC.net CMS</title>
-        <link href="@Href("~/rcAdmin/css/rcCP.css")" rel="stylesheet" />
-        <link href="@Href("~/rcAdmin/css/grid/style.css")" rel="stylesheet" type="text/css" />
+        <link href="@Href("~/razor/control/css/rcCP.css")" rel="stylesheet" />
+        <link href="@Href("~/razor/control/css/grid/style.css")" rel="stylesheet" type="text/css" />
          <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.6.1.js"></script>  
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.14/jquery-ui.js"></script>  
         <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8.1/jquery.validate.js"></script>

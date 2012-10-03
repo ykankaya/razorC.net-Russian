@@ -10,10 +10,13 @@
 
 
     var data = db.QuerySingle (selectQueryString, pageName);
-    if (data == null){Response.Redirect("~/rcError");}
+    if (data == null){
+        Response.SetStatus(HttpStatusCode.NotFound);
+        Response.Redirect("~/rcError");
+        }
     
     //set layout for requested page
-    Layout = "~/rcLayouts/"+ data.pMasterpage;
+    Layout = "~/razor/layouts/"+ data.pMasterpage;
     
     //set meta tags for requested page
     Page.mTitle = data.mTitle;
@@ -31,24 +34,19 @@
 
 }
 @section head{
-@* DO NOT REMOVE THIS COPYRIGHT *@
-<!--
-razorC.net v1.0.5 - http://www.razorC.net 
-Copyright (c) @DateTime.Now.Year  by New Media Group, Inc. 
-Released for free under MS-PL
--->
+<link href="/razor/ui/css/contextmenu.css" rel="stylesheet" /><script src="/razor/ui/javascript/contextmenu.js"></script>
 }
 @*render body*@
 @if (data.pBody){
     //standard body : _rcName.cshtml
     if (data.pBodyFile.StartsWith("_rc")){
-      @RenderPage("~/rcTemplates/Body/" + data.pBodyFile, data); 
+      @RenderPage("~/razor/templates/Body/" + data.pBodyFile, data); 
     }
     else
     { //rcAddons : _addon_ADDONNAME_something.cshtml
         var addon = data.pBodyFile.ToString().Replace("_addon_", "");
         addon = addon.Remove(addon.IndexOf("_"));
-        @RenderPage("~/rcAddons/" + addon + "/Body/" + data.pBodyFile, data);     
+        @RenderPage("~/razor/addons/" + addon + "/Body/" + data.pBodyFile, data);     
     }
 }
 
@@ -68,13 +66,13 @@ Released for free under MS-PL
            if (row.sName == sectionName) { 
                //standard widget : _rcName.cshtml
                if (row.wFile.StartsWith("_rc")){
-           Write(RenderPage("~/rcTemplates/" + row.wFile , row)); 
+           Write(RenderPage("~/razor/templates/" + row.wFile , row)); 
                }
                else
                { //rcAddons : _addon_ADDONNAME_something.cshtml
                    var addon = row.wFile.ToString().Replace("_addon_", "");
                    addon = addon.Remove(addon.IndexOf("_"));
-                   Write(RenderPage("~/rcAddons/" + addon +"/" + row.wFile, row));     
+                   Write(RenderPage("~/razor/addons/" + addon +"/" + row.wFile, row));     
                }
            }
        }

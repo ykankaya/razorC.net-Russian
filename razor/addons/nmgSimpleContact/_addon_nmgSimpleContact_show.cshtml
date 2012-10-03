@@ -1,0 +1,82 @@
+﻿@{
+  
+    //very simple contact form add-on for razorC.net
+
+    var customerName = Request["customerName"];
+    var customerEmail = Request["customerEmail"];
+    var customerPhone = Request["customerPhone"];
+    var customerRequest = Request["customerRequest"];
+    var isActive=true;
+    
+    if (IsPost){
+
+        //load settings and err. msg. from db
+        var db = Database.Open("razorC");
+        var selectQ = "Select TOP 1 * from nmg_SimpleContact";
+         var data = db.QuerySingle(selectQ);
+
+
+     //basic validation, errors msg. from db
+     if (customerName.IsEmpty()) { ModelState.AddFormError(data.errName); }
+     if (customerEmail.IsEmpty()) { 
+         ModelState.AddFormError(data.errEmail); 
+     }else{
+         if (!customerEmail.Contains("@")) { ModelState.AddFormError(data.errEmail2); }
+     }
+     
+     if (customerPhone.IsEmpty()) { ModelState.AddFormError(data.errPhone); }
+     if (customerRequest.IsEmpty()) { ModelState.AddFormError(data.errRequest); }
+        
+     
+        if (ModelState.IsValid ){
+
+            var mailBody = "";
+            foreach (var item in Request.Form)
+            {
+                mailBody += item.ToString() + " :" + Request[item.ToString()] + "<br/>";
+
+            }
+            
+            try {        
+             // Initialize WebMail helper, load values from db        
+             WebMail.SmtpServer = data.smtpServer;        
+             WebMail.SmtpPort = data.smtpPort;
+             WebMail.EnableSsl = data.smtpSSL;
+             WebMail.UserName = data.smtpUser;
+             WebMail.From = data.smtpFrom;
+             WebMail.Password = data.smtpPwd;      
+ 
+         
+             // Send email        
+             WebMail.Send(to: data.smtpTo, subject: data.mailSubject, body: mailBody );    
+             <text>@data.ThankYou</text>
+                isActive = false;
+                
+             }    catch (Exception ex ) {        
+             <text> <b>Письмо не было отправлено</b><br/>
+             @ex.Message.ToString()
+             </text>    
+            }
+        }
+    }
+           
+
+}
+<form method="post" action="@Request.Url">
+
+@Html.ValidationSummary()
+
+    <div>Ваше имя:<br />
+    <input type="text" name="customerName" value="@customerName" />
+    </div>
+    <div>Ваш e-mail:<br />
+    <input type="text" name="customerEmail" value="@customerEmail"/>
+    </div>
+    <div>Ваш телефон:<br />
+    <input type="text" name="customerPhone" value="@customerPhone" />
+    </div>
+    <div>Подробная информация о Вашей проблеме: <br />  
+    <textarea name="customerRequest" cols="45" rows="4">@customerRequest</textarea>
+    </div>   
+    <div><input type="submit" value="Submit" @(!isActive ? "disabled=disabled":"") /></div>
+</form>

@@ -17,11 +17,11 @@
     var fromPage = Request["fromPage"];
     
     //List all Layout files
-    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcLayouts"));  
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/razor/layouts"));  
     FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
 
     // list all the body pages
-    DirectoryInfo dirInfoBody = new DirectoryInfo(Server.MapPath("~/rcTemplates/Body"));
+    DirectoryInfo dirInfoBody = new DirectoryInfo(Server.MapPath("~/razor/templates/Body"));
     FileInfo[] fileInfoBody = dirInfoBody.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
     
     

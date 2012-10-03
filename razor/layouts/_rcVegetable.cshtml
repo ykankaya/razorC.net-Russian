@@ -16,10 +16,10 @@ Released   : 20110416
 <meta name="keywords" content="@Page.mKeywords" />
 <meta name="description" content="@Page.mDescription" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="@Href("~/rcLayouts/vegetable/style.css")" rel="stylesheet" type="text/css" media="screen" />
+<link href="@Href("~/razor/layouts/vegetable/style.css")" rel="stylesheet" type="text/css" media="screen" />
 @RenderSection("head")
 </head>
-<body>
+<body oncontextmenu="return menu(1, event);">
 <div id="header">
 	<div id="logo">
 		@RenderSection("rcTop",false)
@@ -54,6 +54,7 @@ Released   : 20110416
 <div id="footer">
 	<p>Copyright (c) @DateTime.Now.Year @Request.Url.Host.ToLower(). All rights reserved. Design by <a href="http://www.freecsstemplates.org/">FCT</a>. Powered by <a href="http://www.razorc.net" title="free CMS made with ASP.net web pages">razorC</a></p>
 </div>
-<!-- end #footer -->
+<!-- end #footer -->     <div id="contextMenuId" style="position: absolute; top: 1876px; left: 275px; border: 1px solid #d1d1d1;background:#fff; float: left; display: none;box-shadow: 1px Gray;"></div>
+
 </body>
 </html>

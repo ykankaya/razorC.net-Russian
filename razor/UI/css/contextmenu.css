@@ -1,0 +1,29 @@
+#contextMenuId {
+	width:200px;
+	/*position: absolute; 
+                top: 1876px; 
+                left: 275px; 
+                border: 1px solid #d1d1d1;
+                background:#fff; 
+                float: left; 
+                display: none;
+                box-shadow: 1px Gray;*/
+                padding: 4px;
+}
+#contextMenuId a {
+	text-decoration:none;
+	color:#000;
+}
+#context-menu {
+	margin:0;
+	padding:0;
+	font-size: 14px;
+}
+.string {
+	background: #fff;
+	color:#000;
+	padding:3px;
+}
+.string:hover { background: #e3dfdf; }
+.context-image { width:20px; }
+a.link-white-f { color: #e3dfdf; }

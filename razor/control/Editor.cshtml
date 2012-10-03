@@ -11,7 +11,7 @@
        
     
     //List all Layout files
-    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/rcLayouts"));  
+    DirectoryInfo dirInfo = new DirectoryInfo(Server.MapPath("~/razor/layouts/"));  
     FileInfo[] fileInfo = dirInfo.GetFiles("_*.cshtml", SearchOption.TopDirectoryOnly);
     
     if (pMasterPage.IsEmpty()){
@@ -22,14 +22,14 @@
     FileInfo[] fileInfoCSS=null ;
     //some layout files may not have unique folders with the files
     try{
-    DirectoryInfo dirInfoCSS = new DirectoryInfo(Server.MapPath("~/rcLayouts/" + rcFunctions.CleanRCNames(pMasterPage)));  
+    DirectoryInfo dirInfoCSS = new DirectoryInfo(Server.MapPath("~/razor/layouts/" + rcFunctions.CleanRCNames(pMasterPage)));  
     fileInfoCSS = dirInfoCSS.GetFiles("*.css", SearchOption.AllDirectories);
     }catch{}
     
        
     if (IsPost){
 
-        if(!fileContent.IsEmpty() && !fileToEdit.IsEmpty() && fileToEdit.Contains("rcLayouts")){
+        if(!fileContent.IsEmpty() && !fileToEdit.IsEmpty() && fileToEdit.Contains("layouts")){
             try {
             System.IO.File.WriteAllText(fileToEdit,fileContent);
             errMSG = "Файл обновления";
@@ -38,7 +38,7 @@
                 }
         }
     }else{
-    if (!fileToEdit.IsEmpty() && fileToEdit.Contains("rcLayouts")){
+    if (!fileToEdit.IsEmpty() && fileToEdit.Contains("layouts")){
     fileContent= System.IO.File.ReadAllText(fileToEdit);
     }
  }
@@ -71,11 +71,11 @@
                 }
                 </select> <img src="images/help.gif" alt="help" title="Все макеты в папке rcLayouts - вы можете изменить / модифицировать под свои нужды" />
             </li>
-            <li>Файл макета: <a href="@Href("~/rcAdmin/Editor.cshtml?fileToEdit=" +@Server.MapPath("~/rcLayouts/") +@pMasterPage +"&pMasterPage=" +@pMasterPage)">@pMasterPage</a></li>
+            <li>Файл макета: <a href="@Href("~/razor/control/Editor.cshtml?fileToEdit=" +@Server.MapPath("~/razor/layouts/") +@pMasterPage +"&pMasterPage=" +@pMasterPage)">@pMasterPage</a></li>
             <li>CSS файлы:
                 @if (fileInfoCSS!=null){
                     foreach (var f in fileInfoCSS ){
-               <text> <a href="@Href("~/rcAdmin/Editor.cshtml?fileToEdit=" +@f.DirectoryName +"/"  +@f.Name +"&pMasterPage=" +@pMasterPage)">@f.Name</a> , </text>  
+               <text> <a href="@Href("~/razor/control/Editor.cshtml?fileToEdit=" +@f.DirectoryName +"/"  +@f.Name +"&pMasterPage=" +@pMasterPage)">@f.Name</a> , </text>  
                     }
                 }
             </li>
